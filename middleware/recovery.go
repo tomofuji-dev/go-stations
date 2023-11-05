@@ -9,6 +9,8 @@ func Recovery(h http.Handler) http.Handler {
 			// recover(): panic()を捕捉する
 			if err := recover(); err != nil {
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				// funcに処理が続いていたら、処理が続いてしまう
+				return
 			}
 		}()
 		h.ServeHTTP(w, r)

@@ -17,8 +17,8 @@ func Logging(h http.Handler) http.Handler {
 		h.ServeHTTP(w, r)
 
 		// リクエストの処理後のログ
-		endTime := time.Now()
-		latency := endTime.Sub(startTime).Milliseconds()
+		// time.Since(startTime) で startTime からの経過時間を取得できる
+		latency := time.Since(startTime)
 		os, ok := r.Context().Value(model.OSContextKey("os")).(string)
 		if !ok {
 			os = "unknown"
