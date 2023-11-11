@@ -14,8 +14,7 @@ import (
 )
 
 func main() {
-	err := realMain()
-	if err != nil {
+	if err := realMain(); err != nil {
 		log.Fatalln("main: failed to exit successfully, err =", err)
 	}
 }
@@ -26,27 +25,27 @@ func realMain() error {
 		return err
 	}
 
-	// set time zone
 	time.Local, err = time.LoadLocation("Asia/Tokyo")
 	if err != nil {
 		return err
 	}
 
-	// set up sqlite3
 	todoDB, err := db.NewDB(env.DBPath)
 	if err != nil {
 		return err
 	}
 	defer todoDB.Close()
 
-	// NOTE: 新しいエンドポイントの登録はrouter.NewRouterの内部で行うようにする
 	mux := router.NewRouter(env, todoDB)
-
 	srv := &http.Server{
 		Addr:    env.Port,
 		Handler: mux,
 	}
 
+	return startServer(srv)
+}
+
+func startServer(srv *http.Server) error {
 	// set up signal handling
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
 	defer stop()
@@ -54,7 +53,7 @@ func realMain() error {
 	// start server in a goroutine
 	go func() {
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-			log.Fatalln("Server failed to start: ", err)
+			log.Fatalf("Server failed to start: %v", err)
 		}
 	}()
 
@@ -66,9 +65,9 @@ func realMain() error {
 	defer cancel()
 	if err := srv.Shutdown(shutdownCtx); err != nil {
 		log.Printf("Server shutdown failed: %v", err)
-	} else {
-		log.Println("Server gracefully shutdown")
+		return err
 	}
 
+	log.Println("Server gracefully shutdown")
 	return nil
 }
