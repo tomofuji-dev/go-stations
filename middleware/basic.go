@@ -6,7 +6,6 @@ import (
 	"github.com/TechBowl-japan/go-stations/env"
 )
 
-// curl -u admin:admin http://localhost:8080/healthz
 func BasicAuth(env *env.Env, h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		id, password, ok := r.BasicAuth()
