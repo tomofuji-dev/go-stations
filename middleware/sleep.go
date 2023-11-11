@@ -8,7 +8,7 @@ import (
 // graceful shutdownのために、requestを遅延させる
 func Sleep(t time.Duration, h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		time.Sleep(t * time.Second)
+		time.Sleep(t)
 
 		h.ServeHTTP(w, r)
 	}
